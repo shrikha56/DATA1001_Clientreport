@@ -1,0 +1,270 @@
+---
+title: "The Role of Household Income and Parental Working Schedules on Childcare Satisfaction and Pleasure."
+author: "541029720"
+format: 
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    theme: yeti
+---
+
+**The Role of Household Income and Parental Working Schedules on Childcare Satisfaction and Pleasure.**
+
+# Client Bio and Recommendation
+
+![](images/clipboard-2315701503.png)
+
+**Client**: **The Hon. (Prue) Prudence Ann CAR**
+
+*MP (Member of the Legislative Assembly,Deputy Premier, Minister for Education and Early Learning, and Minister for Western Sydney)*
+
+**Bio**: Prue is a strong voice for the community in Government. She also concurrently serves as the [Minister for Education and Early Learning](https://en.wikipedia.org/wiki/Minister_for_Education_and_Early_Learning "Minister for Education and Early Learning") and as the [Minister for Western Sydney](https://en.wikipedia.org/wiki/Minister_for_Western_Sydney "Minister for Western Sydney") in the [NSW state government](https://en.wikipedia.org/wiki/Government_of_New_South_Wales "Government of New South Wales"). As the **Minister for Education and Early Learning**, she is responsible for overseeing the state's education system, including policies related to early childhood education and care.
+
+**Recommendation**: The government must raise awareness about **equitable access to family-friendly workplace arrangements for parents**, particularly fathers ([Article (Study)](https://www.latrobe.edu.au/news/articles/2020/release/does-flexible-work-work-for-parents)). There is a need to address parent work responsibilities on childcare and child support.
+
+```{r, echo=FALSE, results='hide'}
+#read the csv file and store it as the variable "data"
+data <- read.csv("ecec.csv")
+#perform the IDA (find structure of data)
+str(data)
+#remove duplicates from the data
+data <- data[!duplicated(data),]
+#print the column names
+colnames(data)
+
+#create a mapping of the income categories to a range of numbers
+income_mapping <- c("Negative or Zero Income" = 1,
+  "$1 - $19,999 per year ($1 - $379 per week)" = 2,
+  "$20,000 - $29,999 per year ($380 - $579 per week)" = 3,
+  "$30,000 - $39,999 per year ($580 - $769 per week)" = 4,
+  "$40,000 - $49,999 per year ($770 - $959 per week)" = 5,
+  "$50,000 - $59,999 per year ($960 - $1149 per week)" = 6,
+  "$60,000 - $79,999 per year ($1150 - $1529 per week)" = 7,
+  "$80,000 - $99,999 per year ($1530 - $1919 per week)" = 8,
+  "$100,000 - $124,999 per year ($1920 - $2399 per week)" = 9,
+  "$125,000 - $149,999 per year ($2400 - $2879 per week)" = 10,
+  "$150,000 - $199,999 per year ($2880 - $3839 per week)" = 11,
+  "$200,000 - $249,999 per year ($3840 - $4799 per week)" = 12,
+  "$250,000 - $299,999 per year ($4800 - $5759 per week)" = 13,
+  "$300,000 or more per year ($5760 or more per week)" = 14,
+  "Prefer not to answer" = 15
+)
+
+#create a mapping of the satisfaction score categories to a range of numbers
+satisfaction_mapping <- c(
+  "Not at all  satisfied" = 1,
+  "2" = 2,
+  "3" = 3,
+  "4" = 4,
+  "5" = 5,
+  "6" = 6,
+  "Very much  satisfied" = 7
+)
+#create a mapping of the preference score categories to a range of numbers
+preference_mapping <- c(
+  "1 - Strongly disagree" = 1,
+  "2" = 2,
+  "3" = 3,
+  "4" = 4,
+  "5" = 5,
+  "6" = 6,
+  "7 - Strongly agree" = 7
+)
+
+#hide the library importing message
+suppressPackageStartupMessages(library(dplyr))
+#load the library
+library(dplyr)
+
+#create a new df and filter values
+data <- data %>%
+  mutate(
+    income_numeric = income_mapping[D13],
+    satisfaction_numeric = satisfaction_mapping[Q25],
+    preference_numeric = preference_mapping[Q29_5]
+  )
+data <- data %>%
+  filter(income_numeric != 15)
+
+data <- data %>% filter(!D7 %in% c(""))
+
+#write a new csv file with the changes
+write.csv(data,"cleaned_survey_data.csv", row.names=FALSE)
+```
+
+# Evidence
+
+***To investigate whether household income impacts parental pleasure with childcare -***
+
+```{r, echo=FALSE}
+#hide the library importing message
+suppressMessages(library(tidyverse))
+#import library
+library(tidyverse)
+
+#read csv and assign it a variable
+data1001 <- read.csv("cleaned_survey_data.csv")
+#convert the D7 variable to a categorical variable
+data1001$D7 <- as.factor(data1001$D7)
+#convert the preference_numeric variable to a nominal variable
+data1001$preference_numeric <- as.numeric(data1001$preference_numeric)
+#create a summary table
+table = summary(data1001$preference_numeric)
+#display the summary table
+table
+#calculate the mean of preference_numeric 
+mean_pref <- mean(data1001$preference_numeric, na.rm = TRUE)
+#calculate the standard deviation of preference_numeric
+sd_pref <- sd(data1001$preference_numeric, na.rm = TRUE)
+#calculate the unique count of preference_numeric
+unique_count <- length(unique(data1001$preference_numeric))
+#display above calculations
+cat("Mean:", mean_pref, "\n")
+cat("Standard Deviation:", sd_pref, "\n")
+cat("Count of Unique Values:", unique_count, "\n")
+#create a boxplot of Impact Of Working Schedule Of Parent(D7) On Opinion Of Childcare As Pleasure (preference_numeric)
+ggplot(data1001, aes(x=D7, y=preference_numeric)) +
+    geom_boxplot(fill = "skyblue", color = "darkblue", outlier.color = "red", outlier.size = 2) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(title = "Impact Of Working Schedule Of Parent On Opinion Of Childcare As Pleasure", 
+         x = "Working Schedule", 
+         y = "Childcare As Pleasure (1-7)") +
+  geom_jitter(color = "purple", size = 0.3, alpha = 0.6, width = 0.1)
+```
+
+The comparative box plot displays a general trend of consistent parental opinions regarding childcare enjoyment. However, their working schedules significantly impact these perceptions. The median enjoyment score recorded by parents is **4.00**, the scores range from **3.00** to **7.00**. The count of distinct values is **7**, which displays lower variability in the responses of parents. Evidently, most parents moderately agree that childcare is enjoyable. Flexible working schedules display an increase in parents' enjoyment of childcare. Parents with **on-call** or **split shifts** report higher median pleasure scores, which can be linked to increased flexibility and control over schedules providing more quality time with children. On the contrary, within the **regular evening shift** category, the presence of outliers display variability in scores. While the majority of parents in this group express similar views on childcare as pleasure, some individuals report notably lower or higher levels of enjoyment. This fluctuation can be attributed to unique personal circumstances or the specific demands associated with work schedules.
+
+***To investigate whether household income impacts parents' satisfaction with childcare-***
+
+```{r, echo=FALSE}
+#load the libraries
+library(ggplot2)
+library(dplyr)
+library(gifski)
+
+#read the file
+data1001 <- read.csv("cleaned_survey_data.csv")
+
+#summarize the data by 'income_group'
+summary_data <- data1001 %>%
+  group_by(income_numeric) %>%
+  summarise(mean_satisfaction = mean(satisfaction_numeric, na.rm = TRUE),
+            sd_satisfaction = sd(satisfaction_numeric, na.rm = TRUE))
+
+#create the bar plot with error bars
+library(ggplot2)
+
+#convert income_numeric to a categorical variable
+summary_data$income_numeric = factor(summary_data$income_numeric)
+
+plot = ggplot(summary_data, aes(x = income_numeric, y = mean_satisfaction)) +
+  geom_bar(stat = "identity", fill = "lightgreen", width = 0.6) +
+  geom_errorbar(aes(ymin = mean_satisfaction - sd_satisfaction, 
+                    ymax = mean_satisfaction + sd_satisfaction), 
+                width = 0.2, color = "black") +labs(x = "Household Income Group (1-14)", y = "Satisfaction with Childcare (1-7)") +theme_minimal() + scale_x_discrete(labels = income_mapping)
+median_income <- median(data1001$income_numeric, na.rm = TRUE)
+data1001$income_group <- ifelse(data1001$income_numeric > median_income, "High", "Low")
+
+#define two groups based on parental satisfaction scores
+group1 <- data1001$satisfaction_numeric[data1001$income_group == "High"]
+group2 <- data1001$satisfaction_numeric[data1001$income_group == "Low"]
+
+library(gganimate)
+plot + gganimate::transition_states(income_numeric, transition_length = 3, state_length = 1) +
+    view_follow(fixed_x = TRUE)  +
+    labs(title = "Parents' Satisfaction with Childcare Vs Household Income Group",  
+         subtitle  =  "Household Income Group: {closest_state}")
+```
+
+## **Bar plot (Household Income Classification)**
+
+```{r, echo=FALSE}
+income_table <- data.frame(
+  Code = income_mapping, stringsAsFactors = FALSE 
+)
+
+income_table
+```
+
+The analysis of the bar plot data showcases a complex relationship between household income and parental satisfaction with childcare. The average satisfaction scores range from approximately **4.0** to a little over **5.0**, with variability indicated by the error bars. For lower income groups (e.g. **5**), the average satisfaction score is around **4.0**, suggesting moderate satisfaction. In comparision, higher income groups (e.g. **10**) exhibit an average satisfaction score near **5.0**, indicating a shift towards higher satisfaction levels.There is a **weak positive trend**.
+
+# Appendix: Defense of Approach
+
+## **Client**
+
+The chosen client being the minister for education and early learning seemed most appropriate for the analysis of a national survey on early childcare. **This role is extremely important in shaping educational policies**, and must understand the unique circumstances faced by parents across the nation such as parent work schedules and income impact on a child's access to good education and childcare.
+
+## **Statistical Analysis**
+
+***To investigate whether household income "significantly" impacts parents' satisfaction with childcare-***
+
+**Assumptions:**
+
+1.  Independence : Since individuals taking the survey are for national survey purposes, it is assumed that individuals who took the survey were independent from each other.
+
+2.  Equality of Variance and normality: Both populations do not have an equal spread as demonstrated in the bar plot and neither do they emulate a normal curve.
+
+```{r, echo=FALSE}
+
+#perform a Shapiro-Wilk test for High income group
+shapiro_test_high <- shapiro.test(group1)
+
+#perform a Shapiro-Wilk test for Low income group
+shapiro_test_low <- shapiro.test(group2)
+
+#display the results
+print(shapiro_test_high)
+print(shapiro_test_low)
+
+#display the hypothesis testing
+cat("Null Hypothesis (H0): The data is normally distributed.\n\nAlternative Hypothesis (H1):The data is not normally distributed.")
+
+```
+
+**Since the p-value from the Shapiro-Wilk test is smaller than 0.05, we reject the null hypothesis of normality. Therefore, the data is not normally distributed.**
+
+```{r, echo=FALSE}
+
+#perform a Mann-Whitney U test (Wilcoxon rank-sum test)
+mann_whitney_result <- wilcox.test(group1, group2)
+
+#display result
+print(mann_whitney_result)
+
+cat("\nNull Hypothesis (H0): There is no difference in parental satisfaction with childcare between different household income groups.\n
+Alternative Hypothesis (H1): There is a difference in parental satisfaction with childcare between different household income groups.")
+
+```
+
+It can be determined that the p-value is **0.07088** which is greater **0.05**. This means that there is not enough evidence to reject the hypothesis, retaining the claim that there is ***no statistically significant difference in parental satisfaction with childcare between different household income groups.***
+
+# Assumptions and Limitations
+
+-   Responses are independent from each other.
+
+-   The data sampling was random.
+
+-   Economic conditions during the study were relatively stable.
+
+-   Some data is missing due to privacy concerns.
+
+-   Working conditions during the study were relatively stable.
+
+# Ethics Statement
+
+**Ethical considerations: Our shared professional values are respect, professionalism and integrity. This was upheld by anonymity, transparency and honesty in producing the report.**
+
+# Acknowledgments
+
+-   ***Client Bio Information:*** [Client Bio information](https://www.nswlabor.org.au/prue_car)
+
+-   ***Article on flexible work for parents:*** [Article](https://www.latrobe.edu.au/news/articles/2020/release/does-flexible-work-work-for-parents)
+
+-   ***Article on statistics test:*** [Article](https://www.onlinespss.com/mann-whitney-u-test-in-r/)
+
+-   ***Canvas lectures notes:*** [Modules:Tests for Means](https://canvas.sydney.edu.au/courses/59062/pages/10-dot-2-discover?module_item_id=2324104)
+
+    [ED modules (gganimate, hypothesis testing, generating bar plot)](https://edstem.org/au/courses/16787/lessons/)
+
+-   ***Para-phrasing tool:*** [Paraphrasing tool](https://quillbot.com/app/chrome-extension?utm_medium=cpc&utm_source=google&utm_campaign=FA+-+HY+%7C+PERF+-+Search+%7C+Product+-+Ext+-+Chrome+-+Brand+%7C+PREM+%7C+CPA&utm_term=quillbot&utm_content=712027389560&campaign_type=search-21658135865&click_id=CjwKCAjwpbi4BhByEiwAMC8JnVyieC7R8KXha6JL0uB9T_Yd6fHpF91w4dBQfrkdTTO2caNMdkZqqhoCflQQAvD_BwE&campaign_id=21658135865&adgroup_id=169729553951&ad_id=712027389560&keyword=quillbot&placement=&target=&network=g&gad_source=1&gclid=CjwKCAjwpbi4BhByEiwAMC8JnVyieC7R8KXha6JL0uB9T_Yd6fHpF91w4dBQfrkdTTO2caNMdkZqqhoCflQQAvD_BwE)
